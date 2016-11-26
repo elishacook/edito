@@ -37,6 +37,7 @@ gulp.task('build-dev', function ()
             standalone: 'edito'
         })
         .bundle()
+        .on('error', gutil.log)
         .pipe(source('edito.js'))
         .pipe(gulp.dest('./build/'))
 })

@@ -4,6 +4,7 @@ var splice = require('../util/splice')
 var Range = require('../model/range')
 var Point = require('../model/point')
 var Text = require('../model/text')
+var Annotation = require('../model/annotation')
 
 module.exports = function (document, selection)
 {
@@ -59,7 +60,23 @@ function backspace_at_beginning (document, selection)
         )
       }),
       selection: Object.assign({}, selection, {
-        start: Point.embed({ index: selection.start.index - 1 })
+        start: Point.create({ index: selection.start.index - 1 })
+      })
+    }
+  }
+  
+  else if (cur_element.type == 'embed')
+  {
+    return {
+      document: Object.assign({}, document, {
+        elements: splice(
+          document.elements,
+          selection.start.index,
+          1
+        )
+      }),
+      selection: Object.assign({}, selection, {
+        start: Point.create({ index: selection.start.index - 1 })
       })
     }
   }
@@ -76,7 +93,7 @@ function backspace_at_beginning (document, selection)
         ) 
       }),
       selection: Object.assign({}, selection, {
-        start: Point.text({
+        start: Point.create({
           index: selection.start.index - 1,
           offset: prev_element.text.length
         })
@@ -100,5 +117,81 @@ function merge_text_elements (a, b)
 
 function remove_selection (document, selection)
 {
+  var start_element = document.elements[selection.start.index]
+  var end_element = document.elements[selection.end.index]
+  var replacement_element
   
+  if (start_element.type != 'embed')
+  {
+    replacement_element = slice_text_element(start_element, selection.start.offset, start_element.text.length)
+  }
+  
+  if (end_element.type != 'embed')
+  {
+    var new_end_element = slice_text_element(end_element, 0, selection.end.offset)
+    if (new_end_element.text.length > 0)
+    {
+      if (replacement_element)
+      {
+        replacement_element = merge_text_elements(replacement_element, new_end_element)
+      }
+      else
+      {
+        replacement_element = new_end_element
+      }
+    }
+  }
+  
+  var args = [
+    document.elements, 
+    selection.start.index, 
+    selection.end.index - selection.start.index + 1
+  ]
+  
+  if (replacement_element)
+  {
+    args.push(replacement_element)
+  }
+  
+  return {
+    document: Object.assign({}, document, {
+      elements: splice.apply(null, args)
+    }),
+    selection: Object.assign({}, selection, {
+      start: selection.start,
+      end: null
+    })
+  }
+}
+
+function slice_text_element (element, start, end)
+{
+  // selections can are bidirectional. Here we normalize to LTR
+  start = Math.max(Math.min(start, element.text.length), 0)
+  end = Math.max(Math.min(end, element.text.length), 0)
+  
+  if (element.text.length <= end - start)
+  {
+    return Object.assign({}, element, {
+      text: '',
+      annotations: []
+    })
+  }
+  else
+  {
+    return Object.assign({}, element, {
+      text: element.text.slice(0, start) + element.text.slice(end),
+      annotations: Annotation.clear_range(element.annotations, start, end).map(function (ann)
+      {
+        if (ann.offset >= end)
+        {
+          return Object.assign({}, ann, { offset: start })
+        }
+        else
+        {
+          return ann
+        }
+      })
+    })
+  }
 }

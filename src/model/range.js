@@ -4,10 +4,19 @@ module.exports =
 {
   create: function (args)
   {
-    return Object.assign({
+    var range = Object.assign({
       start: null,
       end: null
     }, args)
+    
+    if (range.start && range.end && range.start.index > range.end.index)
+    {
+      var tmp = range.start
+      range.start = range.end
+      range.end = tmp
+    }
+    
+    return range
   },
   
   is_collapsed: function (range)

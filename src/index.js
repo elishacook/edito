@@ -28,9 +28,8 @@ function Editor(args)
   this.container.contentEditable = true
   
   this.container.addEventListener('paste', events.paste.bind(null, this))
+  this.container.addEventListener('input', events.input.bind(null, this))
   this.container.addEventListener('keydown', events.keydown.bind(null, this))
-  this.container.addEventListener('keypress', events.keypress.bind(null, this))
-  this.container.addEventListener('keyup', events.keyup.bind(null, this))
   document.addEventListener('selectionchange', events.selectionchange.bind(null, this))
 }
 
@@ -61,7 +60,6 @@ Object.assign(Editor.prototype,
     if (result)
     {
       this.document = result.document
-      console.log(this.document)
       render(this.container, this.document)
       this.set_selection(result.selection)
     }

@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = 
+var Annotation =
 {
   create: function (args)
   {
@@ -11,6 +11,72 @@ module.exports =
       name: 'bold',
       attributes: {}
     }, args)
+  },
+  
+  overlaps: function (annotation, start, end)
+  {
+    return (annotation.offset < end && annotation.offset + annotation.length > start)
+  },
+  
+  clear_range: function (annotations, start, end)
+  {
+    var new_annotations = []
+    var length = end - start
+    
+    annotations.forEach(function (ann)
+    {
+      var ann_end = ann.offset + ann.length
+      
+      if (Annotation.overlaps(ann, start, end))
+      {
+        // Annotation is completely cleared
+        if (start <= ann.offset && end >= ann_end)
+        {
+          return
+        }
+        
+        // A chunk out of the middle
+        if (start > ann.offset && end < ann_end)
+        {
+          new_annotations.push(
+            Object.assign({}, ann, {
+              length: ann.offset - start
+            })
+          )
+          new_annotations.push(
+            Object.assign({}, ann, {
+              offset: end,
+              length: ann.end - end
+            })
+          )
+        }
+        // The beginning cut off
+        else if (start <= ann.offset)
+        {
+          new_annotations.push(
+            Object.assign({}, ann, {
+              offset: end,
+              length: ann_end - end
+            })
+          )
+        }
+        // The end cut off
+        else
+        {
+          new_annotations.push(
+            Object.assign({}, ann, {
+              length: start - ann.offset
+            })
+          )
+        }
+      }
+      else
+      {
+        new_annotations.push(ann)
+      }
+    })
+    
+    return new_annotations
   },
   
   get_actions: function (annotations)
@@ -72,3 +138,5 @@ function add_action (actions, type, offset, ann)
   
   actions[offset][type].push(ann)
 }
+
+module.exports = Annotation

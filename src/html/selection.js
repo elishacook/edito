@@ -24,16 +24,23 @@ module.exports =
     }
     
     var start = get_element_point(doc.elements, container, start_node, selection.anchorOffset)
+    var end = get_element_point(doc.elements, container, end_node, selection.focusOffset)
     
-    if (start_node == end_node &&
-        selection.anchorOffset == selection.focusOffset)
+    if (end.index == start.index && end.offset == start.offset)
     {
       return Range.create({ start: start })
     }
-    
-    var end = get_element_point(doc.elements, container, end_node, selection.focusOffset)
-    
-    return Range.create({ start: start, end: end })
+    else
+    {
+      if (start.index > end.index || start.offset > end.offset)
+      {
+        var tmp = start
+        start = end
+        end = tmp
+      }
+      
+      return Range.create({ start: start, end: end })
+    }
   },
   
   set: function (container, doc, doc_range)
@@ -154,7 +161,7 @@ function get_text_point (index, element, root_node, sel_node, sel_offset)
   var offset = { value: sel_offset }
   get_text_offset(root_node, sel_node, offset)
   
-  return Point.text({
+  return Point.create({
     index: index,
     offset: offset.value
   })
@@ -188,7 +195,7 @@ function get_text_offset (root_node, sel_node, offset)
 
 function get_embed_point (index, element, root_node, sel_node, offset)
 {
-  return Point.embed({ index: index })
+  return Point.create({ index: index })
 }
 
 function get_dom_point (container, elements, doc_point)
