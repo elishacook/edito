@@ -52,7 +52,7 @@ module.exports =
     
     if (doc_range.end)
     {
-      var end = get_dom_point(container, doc, doc_range.end)
+      var end = get_dom_point(container, doc.elements, doc_range.end)
       range.setEnd(end.node, end.offset)
     }
     

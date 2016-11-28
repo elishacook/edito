@@ -8,7 +8,8 @@ var render = html.render
 var selection = html.selection
 
 module.exports = {
-  Editor: Editor
+  Editor: Editor,
+  commands: require('./commands')
 }
 
 function Editor(args)

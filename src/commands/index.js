@@ -3,5 +3,6 @@
 module.exports = 
 {
   backspace: require('./backspace'),
-  break: require('./break')
+  break: require('./break'),
+  update_element: require('./update_element')
 }

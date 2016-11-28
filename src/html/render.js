@@ -44,6 +44,8 @@ function render_list (element, context)
     if (context.list != element.name)
     {
       html += close_tag({ name: context.list })
+      context.list = element.name
+      html += open_tag(element)
     }
   }
   else
