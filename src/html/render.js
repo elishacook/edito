@@ -167,7 +167,7 @@ function render_annotations (element)
 {
   if (!element.annotations || element.annotations.length == 0)
   {
-    return element.text
+    return element.text ? element.text : '<br>'
   }
   else
   {

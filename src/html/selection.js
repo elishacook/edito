@@ -185,12 +185,14 @@ function get_text_offset (root_node, sel_node, offset)
     {
       if (!get_text_offset(cur_child, sel_node, offset))
       {
-        return
+        return false
       }
     }
     
     cur_child = cur_child.nextSibling
   }
+  
+  return true
 }
 
 function get_embed_point (index, element, root_node, sel_node, offset)
@@ -217,7 +219,7 @@ function get_dom_point_for_text(element, node, doc_point)
 {
   if (!element.annotations || element.annotations.length == 0)
   {
-    return { node: node.firstChild, offset: doc_point.offset }
+    return { node: node.firstChild ? node.firstChild : node, offset: doc_point.offset }
   }
   else
   {
@@ -238,7 +240,7 @@ function get_dom_point_for_offset_in_text (node, offset)
   {
     if (cur_node.nodeType == 3) // text
     {
-      if (offset < cur_node.nodeValue.length)
+      if (offset <= cur_node.nodeValue.length)
       {
         return { node: cur_node, offset: offset }
       }

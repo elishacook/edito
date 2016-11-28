@@ -4,7 +4,6 @@ var splice = require('../util/splice')
 var Range = require('../model/range')
 var Point = require('../model/point')
 var Text = require('../model/text')
-var Annotation = require('../model/annotation')
 
 module.exports = function (document, selection)
 {
@@ -19,7 +18,7 @@ module.exports = function (document, selection)
     
     return backspace_at_beginning(document, selection)
   }
-  else if (Range.spans_multiple_elements(selection))
+  else
   {
     return remove_selection (document, selection)
   }
@@ -117,18 +116,31 @@ function merge_text_elements (a, b)
 
 function remove_selection (document, selection)
 {
+  if (Range.spans_multiple_elements(selection))
+  {
+    return remove_multiple_selection(document, selection)
+  }
+  else
+  {
+    return remove_single_selection(document, selection)
+  }
+  
+}
+
+function remove_multiple_selection (document, selection)
+{
   var start_element = document.elements[selection.start.index]
   var end_element = document.elements[selection.end.index]
   var replacement_element
   
   if (start_element.type != 'embed')
   {
-    replacement_element = slice_text_element(start_element, selection.start.offset, start_element.text.length)
+    replacement_element = Text.cut(start_element, selection.start.offset, start_element.text.length)
   }
   
   if (end_element.type != 'embed')
   {
-    var new_end_element = slice_text_element(end_element, 0, selection.end.offset)
+    var new_end_element = Text.cut(end_element, 0, selection.end.offset)
     if (new_end_element.text.length > 0)
     {
       if (replacement_element)
@@ -164,34 +176,21 @@ function remove_selection (document, selection)
   }
 }
 
-function slice_text_element (element, start, end)
+
+function remove_single_selection (document, selection)
 {
-  // selections can are bidirectional. Here we normalize to LTR
-  start = Math.max(Math.min(start, element.text.length), 0)
-  end = Math.max(Math.min(end, element.text.length), 0)
-  
-  if (element.text.length <= end - start)
-  {
-    return Object.assign({}, element, {
-      text: '',
-      annotations: []
-    })
-  }
-  else
-  {
-    return Object.assign({}, element, {
-      text: element.text.slice(0, start) + element.text.slice(end),
-      annotations: Annotation.clear_range(element.annotations, start, end).map(function (ann)
-      {
-        if (ann.offset >= end)
-        {
-          return Object.assign({}, ann, { offset: start })
-        }
-        else
-        {
-          return ann
-        }
-      })
+  return {
+    document: Object.assign({}, document, {
+      elements: splice(
+        document.elements,
+        selection.start.index,
+        1,
+        Text.cut(document.elements[selection.start.index], selection.start.offset, selection.end.offset)
+      )
+    }),
+    selection: Object.assign({}, selection, {
+      start: selection.start,
+      end: null
     })
   }
 }

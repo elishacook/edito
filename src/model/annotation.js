@@ -21,37 +21,48 @@ var Annotation =
   clear_range: function (annotations, start, end)
   {
     var new_annotations = []
-    var length = end - start
     
-    annotations.forEach(function (ann)
-    {
-      var ann_end = ann.offset + ann.length
-      
-      if (Annotation.overlaps(ann, start, end))
+    annotations
+      .forEach(function (ann)
       {
-        // Annotation is completely cleared
-        if (start <= ann.offset && end >= ann_end)
+        var ann_end = ann.offset + ann.length
+        
+        // falls completely within the cleared range
+        if (ann.offset >= start  && ann_end <= end)
         {
           return
         }
-        
-        // A chunk out of the middle
-        if (start > ann.offset && end < ann_end)
+        // falls completely outside the cleared range
+        else if (ann_end <= start || ann.offset >= end)
+        {
+          new_annotations.push(ann)
+        }
+        // Cleared range takes a chunk out of the middle
+        else if (end < ann_end  && start > ann.offset)
         {
           new_annotations.push(
             Object.assign({}, ann, {
-              length: ann.offset - start
+              length: start - ann.offset
             })
           )
           new_annotations.push(
             Object.assign({}, ann, {
               offset: end,
-              length: ann.end - end
+              length: ann_end - end
             })
           )
         }
-        // The beginning cut off
-        else if (start <= ann.offset)
+        // Overlaps beginning
+        else if (ann.offset <= start)
+        {
+          new_annotations.push(
+            Object.assign({}, ann, {
+              length: start - ann.offset
+            })
+          )
+        }
+        // Overlaps end
+        else if (ann_end >= end)
         {
           new_annotations.push(
             Object.assign({}, ann, {
@@ -60,23 +71,9 @@ var Annotation =
             })
           )
         }
-        // The end cut off
-        else
-        {
-          new_annotations.push(
-            Object.assign({}, ann, {
-              length: start - ann.offset
-            })
-          )
-        }
-      }
-      else
-      {
-        new_annotations.push(ann)
-      }
-    })
-    
-    return new_annotations
+      })
+      
+      return new_annotations
   },
   
   get_actions: function (annotations)

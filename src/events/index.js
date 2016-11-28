@@ -17,6 +17,11 @@ module.exports =
   
   keydown: function (editor, event)
   {
+    if (event.which >= 37 && event.which <= 40)
+    {
+      return
+    }
+    
     var selection = editor.get_selection()
     var selection_spans_multiple = Range.spans_multiple_elements(selection)
     var selection_at_beginning = Range.is_collapsed(selection) && !selection.start.offset
@@ -33,7 +38,7 @@ module.exports =
     else if (is_new_line)
     {
       event.preventDefault()
-      //editor.run_command(event.break, editor.get_selection())
+      editor.run_command(commands.break, editor.get_selection())
     }
   },
   

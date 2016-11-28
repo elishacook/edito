@@ -2,5 +2,6 @@
 
 module.exports = 
 {
-  backspace: require('./backspace')
+  backspace: require('./backspace'),
+  break: require('./break')
 }
