@@ -7,6 +7,11 @@ var Text = require('../model/text')
 
 module.exports = function (document, selection)
 {
+  if (!selection)
+  {
+    return
+  }
+  
   if (Range.is_collapsed(selection) && !selection.start.offset)
   {
     // A backspace at the very beginning of the first element

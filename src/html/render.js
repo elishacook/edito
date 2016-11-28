@@ -45,16 +45,16 @@ function render_list (element, context)
     {
       html += close_tag({ name: context.list })
       context.list = element.name
-      html += open_tag(element)
+      html += open_tag({ name: element.name })
     }
   }
   else
   {
     context.list = element.name
-    html += open_tag(element)
+    html += open_tag({ name: element.name })
   }
   
-  return html + open_tag({ name: 'li' }) + render_annotations(element) + close_tag({ name: 'li' })
+  return html + open_tag(Object.assign({}, element, { name: 'li' })) + render_annotations(element) + close_tag({ name: 'li' })
 }
 
 function render_embed (element, context)
@@ -157,12 +157,51 @@ function render_attributes (attributes)
     {
       attrs_string.push('class='+attributes[k])
     }
+    else if (k == 'style')
+    {
+      var style = render_style(attributes[k])
+      if (style)
+      {
+        attrs_string.push('style='+style)
+      }
+    }
     else
     {
       attrs_string.push(k+'="'+attributes[k]+'"')
     }
   })
   return attrs_string.join(' ')
+}
+
+function render_style (style)
+{
+  if (!style)
+  {
+    return
+  }
+  
+  var keys = Object.keys(style)
+  
+  if (keys.length == 0)
+  {
+    return
+  }
+  
+  var properties = []
+  
+  keys.forEach(function (k)
+  {
+    properties.push(
+      k.replace(/[A-Z]/g, function (x)
+      {
+        return '-' + x.toLowerCase()
+      })
+      +
+      ':' + style[k]
+    )
+  })
+  
+  return properties.join(';')
 }
 
 function render_annotations (element)

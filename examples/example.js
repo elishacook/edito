@@ -43,3 +43,12 @@ lists.forEach(function (l)
     editor.run_command(edito.commands.update_element, editor.get_selection(), { type: 'list', name: l })
   })
 })
+
+alignment.forEach(function (a)
+{
+  document.getElementById('action-'+a).addEventListener('click', function (e)
+  {
+    e.preventDefault()
+    editor.run_command(edito.commands.update_style, editor.get_selection(), { 'textAlign': a })
+  })
+})

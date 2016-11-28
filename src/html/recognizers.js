@@ -173,7 +173,26 @@ function parse_attributes (node)
     attrs[a.name] = a.value
   })
   
-  delete attrs.style
+  attrs.style = parse_style(node)
   
   return attrs
+}
+
+
+function parse_style (node)
+{
+  var style = {}
+  
+  Object.keys(node.style).forEach(function (k)
+  {
+    if (k && node.style[k])
+    {
+      style[k] = node.style[k]
+    }
+  })
+  
+  if (Object.keys(style).length > 0)
+  {
+    return style
+  }
 }

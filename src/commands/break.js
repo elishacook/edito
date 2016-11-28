@@ -8,6 +8,11 @@ var backspace = require('./backspace')
 
 module.exports = function (document, selection)
 {
+  if (!selection)
+  {
+    return
+  }
+  
   if (!Range.is_collapsed(selection))
   {
     var result = backspace(document, selection)

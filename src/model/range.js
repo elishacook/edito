@@ -27,5 +27,11 @@ module.exports =
   spans_multiple_elements: function (range)
   {
     return (range.end != null && range.start.index != range.end.index)
+  },
+  
+  get_selected_elements: function (range, document)
+  {
+    var end_index = range.end ? range.end.index : range.start.index
+    return document.elements.slice(range.start.index, end_index + 1)
   }
 }

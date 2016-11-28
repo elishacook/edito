@@ -3,7 +3,7 @@
 var splice = require('../util/splice')
 var Range = require('../model/range')
 
-module.exports = function (document, selection, element_update)
+module.exports = function (document, selection, style_update)
 {
   if (!selection)
   {
@@ -19,7 +19,11 @@ module.exports = function (document, selection, element_update)
   ].concat(
     selected_elements.map(function (x)
     {
-      return Object.assign({}, x, element_update)
+      return Object.assign({}, x, {
+        attributes: Object.assign({}, x.attributes, {
+          style: Object.assign({}, x.attributes.style, style_update)
+        })
+      })
     })
   )
   
