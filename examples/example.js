@@ -20,7 +20,7 @@ var alignment = [
   'right'
 ]
 
-var styles = [
+var annotations = [
   'bold',
   'italic',
   'underline'
@@ -50,5 +50,14 @@ alignment.forEach(function (a)
   {
     e.preventDefault()
     editor.run_command(edito.commands.update_style, editor.get_selection(), { 'textAlign': a })
+  })
+})
+
+annotations.forEach(function (a)
+{
+  document.getElementById('action-'+a).addEventListener('click', function (e)
+  {
+    e.preventDefault()
+    editor.run_command(edito.commands.toggle_annotation, editor.get_selection(), { name: a })
   })
 })

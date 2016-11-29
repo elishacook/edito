@@ -22,7 +22,7 @@ function oembed (node)
 {
   if (node.className == 'oembed')
   {
-    return model.embed.create({
+    return model.Embed.create({
       name: 'oembed',
       html: node.innerHTML
     })
@@ -67,7 +67,7 @@ function figure (node)
       }
     }
     
-    return model.embed.create(args)
+    return model.Embed.create(args)
   }
 }
 
@@ -88,12 +88,12 @@ function list (node)
         
         Array.prototype.forEach.call(child_node.childNodes, parse_text_child_node.bind(null, context))
         
-        elements.push(model.list.create(
+        elements.push(model.List.create(
         {
           name: node.tagName.toLowerCase(),
           text: context.text,
           attributes: parse_attributes(child_node),
-          annotations: context.annotations
+          annotations: model.Annotation.merge_similar(context.annotations)
         }))
       }
     })
@@ -118,7 +118,7 @@ function text (node)
     tag = 'p'
   }
   
-  return model.text.create(
+  return model.Text.create(
   {
     name: tag,
     text: context.text,
@@ -152,7 +152,7 @@ function parse_text_child_node (context, node)
     if (-1 < priority)
     {
       context.annotations.push(
-        model.annotation.create(
+        model.Annotation.create(
         {
           offset: offset,
           length: context.text.length - offset,

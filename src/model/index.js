@@ -2,9 +2,9 @@
 
 module.exports = 
 {
-  annotation: require('./annotation'),
-  document: require('./document'),
-  embed: require('./embed'),
-  list: require('./list'),
-  text: require('./text')
+  Annotation: require('./annotation'),
+  Document: require('./document'),
+  Embed: require('./embed'),
+  List: require('./list'),
+  Text: require('./text')
 }

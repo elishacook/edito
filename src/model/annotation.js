@@ -18,6 +18,61 @@ var Annotation =
     return (annotation.offset < end && annotation.offset + annotation.length > start)
   },
   
+  contains: function (annotation, start, end)
+  {
+    return (start >= annotation.offset && end <= annotation.offset + annotation.length)
+  },
+  
+  merge_similar: function (annotations)
+  {
+    var by_name = {}
+    annotations.forEach(function (x)
+    {
+      if (!by_name[x.name])
+      {
+        by_name[x.name] = [x]
+      }
+      else
+      {
+        by_name[x.name].push(x)
+      }
+    })
+    
+    var new_annotations = []
+    
+    Object.keys(by_name).forEach(function (k)
+    {
+      var annotations = by_name[k]
+      annotations.sort(compare_annotation_offsets)
+      
+      var stack = [annotations.shift()]
+      
+      annotations.forEach(function (current)
+      {
+        var last = stack[stack.length-1]
+        var last_end = last.offset + last.length
+        var current_end = current.offset + current.length
+        
+        if (current.offset <= last_end)
+        {
+          if (current_end > last_end)
+          {
+            stack[stack.length - 1] = Object.assign({}, last, { length: current_end - last.offset })
+          }
+        }
+        else
+        {
+          stack.push(current)
+        }
+      })
+      
+      new_annotations = new_annotations.concat(stack)
+      
+    })
+    
+    return new_annotations
+  },
+  
   clear_range: function (annotations, start, end)
   {
     var new_annotations = []
@@ -134,6 +189,11 @@ function add_action (actions, type, offset, ann)
   }
   
   actions[offset][type].push(ann)
+}
+
+function compare_annotation_offsets (a, b)
+{
+  return a.offset - b.offset
 }
 
 module.exports = Annotation

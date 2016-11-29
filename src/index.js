@@ -1,6 +1,5 @@
 'use strict'
 
-var model = require('./model')
 var events = require('./events')
 var html = require('./html')
 var parse = html.parse

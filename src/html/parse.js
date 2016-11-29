@@ -1,6 +1,6 @@
 'use strict'
 
-var Document = require('../model').document
+var Document = require('../model/document')
 var default_recognizers = require('./recognizers')
 
 module.exports = function (node, recognizers)

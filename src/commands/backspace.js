@@ -68,7 +68,6 @@ function backspace_at_beginning (document, selection)
       })
     }
   }
-  
   else if (cur_element.type == 'embed')
   {
     return {
@@ -93,7 +92,7 @@ function backspace_at_beginning (document, selection)
           document.elements,
           selection.start.index - 1,
           2,
-          merge_text_elements(prev_element, cur_element)
+          Text.merge(prev_element, cur_element)
         ) 
       }),
       selection: Object.assign({}, selection, {
@@ -104,19 +103,6 @@ function backspace_at_beginning (document, selection)
       })
     }
   }
-}
-
-function merge_text_elements (a, b)
-{
-  var a_text_length = a.text.length
-  return Object.assign({}, a, {
-    text: a.text + b.text,
-    annotations: a.annotations.concat(
-      b.annotations.map(function (x) {
-        return Object.assign({}, x, { offset: x.offset + a_text_length })
-      })
-    )
-  })
 }
 
 function remove_selection (document, selection)
@@ -150,7 +136,7 @@ function remove_multiple_selection (document, selection)
     {
       if (replacement_element)
       {
-        replacement_element = merge_text_elements(replacement_element, new_end_element)
+        replacement_element = Text.merge(replacement_element, new_end_element)
       }
       else
       {

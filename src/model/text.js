@@ -15,6 +15,21 @@ module.exports =
     }, args)
   },
   
+  merge: function (a, b)
+  {
+    var a_text_length = a.text.length
+    return Object.assign({}, a, {
+      text: a.text + b.text,
+      annotations: Annotation.merge_similar(
+        a.annotations.concat(
+          b.annotations.map(function (x) {
+            return Object.assign({}, x, { offset: x.offset + a_text_length })
+          })
+        )
+      )
+    })
+  },
+  
   cut: function (element, start, end)
   {
     if (element.text.length <= end - start)
