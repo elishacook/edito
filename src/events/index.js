@@ -7,7 +7,7 @@ module.exports =
 {
   paste: function (editor, event)
   {
-    
+    event.preventDefault()
   },
   
   input: function (editor, event)

@@ -157,7 +157,7 @@ function parse_text_child_node (context, node)
           offset: offset,
           length: context.text.length - offset,
           priority: priority,
-          name: tag,
+          name: model.Annotation.get_canonical_name(tag),
           attributes: parse_attributes(node)
         })
       )

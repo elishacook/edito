@@ -1,5 +1,21 @@
 'use strict'
 
+var aliases = {
+  b: ['bold', 'strong'],
+  em: ['i', 'italic'],
+  u: ['underline'],
+  s: ['strike', 'strikethru', 'del']
+}
+
+var aliases_index = {}
+Object.keys(aliases).forEach(function (canonical_name)
+{
+  aliases[canonical_name].forEach(function (alias)
+  {
+    aliases_index[alias] = canonical_name
+  })
+})
+
 var Annotation =
 {
   create: function (args)
@@ -21,6 +37,48 @@ var Annotation =
   contains: function (annotation, start, end)
   {
     return (start >= annotation.offset && end <= annotation.offset + annotation.length)
+  },
+  
+  get_canonical_name: function (name)
+  {
+    return (aliases_index[name] || name)
+  },
+  
+  is_continuous: function (annotations, prototype_annotation, start, end)
+  {
+    // Only checking overlapping annotations of the same type
+    var annotations = annotations
+      .filter(function (ann)
+      {
+        return (
+          ann.name == prototype_annotation.name &&
+          Annotation.overlaps(ann, start, end)
+        )
+      })
+      .sort(compare_annotation_offsets)
+    
+    if (annotations.length == 0)
+    {
+      return
+    }
+    
+    var first = annotations[0]
+    var last = annotations[annotations.length-1]
+    
+    if (first.offset > start ||
+        last.offset + last.length < end)
+    {
+      return false
+    }
+    
+    var stack = [annotations.shift()]
+    
+    return annotations.every(function (current)
+    {
+      var last = stack[stack.length - 1]
+      stack.push(current)
+      return (last.offset + last.length >= current.offset)
+    })
   },
   
   merge_similar: function (annotations)
@@ -73,13 +131,19 @@ var Annotation =
     return new_annotations
   },
   
-  clear_range: function (annotations, start, end)
+  clear_range: function (annotations, start, end, prototype_annotation)
   {
     var new_annotations = []
     
     annotations
       .forEach(function (ann)
       {
+        if (prototype_annotation && ann.name != prototype_annotation.name)
+        {
+          new_annotations.push(ann)
+          return
+        }
+        
         var ann_end = ann.offset + ann.length
         
         // falls completely within the cleared range
@@ -108,21 +172,21 @@ var Annotation =
           )
         }
         // Overlaps beginning
-        else if (ann.offset <= start)
-        {
-          new_annotations.push(
-            Object.assign({}, ann, {
-              length: start - ann.offset
-            })
-          )
-        }
-        // Overlaps end
-        else if (ann_end >= end)
+        else if (start <= ann.offset)
         {
           new_annotations.push(
             Object.assign({}, ann, {
               offset: end,
               length: ann_end - end
+            })
+          )
+        }
+        // Overlaps end
+        else if (ann_end <= end)
+        {
+          new_annotations.push(
+            Object.assign({}, ann, {
+              length: start - ann.offset
             })
           )
         }

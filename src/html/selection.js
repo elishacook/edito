@@ -229,12 +229,12 @@ function get_dom_point_for_text(element, node, doc_point)
 
 function get_dom_point_for_offset_in_text (node, offset)
 {
-  var cur_node = node.firstChild
-  
   if (offset == 0)
   {
-    return { node: cur_node, offset: 0 }
+    return { node: node.firstChild ? node.firstChild : node, offset: 0 }
   }
+  
+  var cur_node = node.firstChild
   
   while (cur_node)
   {

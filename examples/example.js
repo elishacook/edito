@@ -23,7 +23,8 @@ var alignment = [
 var annotations = [
   'bold',
   'italic',
-  'underline'
+  'underline',
+  'strikethru'
 ]
 
 blocks.forEach(function (b)

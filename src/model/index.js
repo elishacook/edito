@@ -6,5 +6,7 @@ module.exports =
   Document: require('./document'),
   Embed: require('./embed'),
   List: require('./list'),
-  Text: require('./text')
+  Text: require('./text'),
+  Range: require('./range'),
+  Point: require('./point')
 }
