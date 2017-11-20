@@ -8,6 +8,7 @@ module.exports = function (node, document)
   var html = document.elements.map(render_element.bind(null, context)).join('')
   html += close_list(context)
   node.innerHTML = html
+  return html
 }
 
 function render_element (context, element)

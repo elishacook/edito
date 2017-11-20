@@ -44,5 +44,8 @@ module.exports =
   
   selectionchange: function (editor, event)
   {
+    if (editor.onselectionchange) {
+      editor.onselectionchange(editor)
+    }
   }
 }

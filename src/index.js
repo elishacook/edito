@@ -8,7 +8,8 @@ var selection = html.selection
 
 module.exports = {
   Editor: Editor,
-  commands: require('./commands')
+  Model: require('./model'),
+  Commands: require('./commands')
 }
 
 function Editor(args)
@@ -17,7 +18,8 @@ function Editor(args)
     this,
     {
       container: document.getElementById('edito'),
-      onchange: null
+      onchange: null,
+      onselectionchange: null,
     },
     args
   )
@@ -60,8 +62,22 @@ Object.assign(Editor.prototype,
     if (result)
     {
       this.document = result.document
-      render(this.container, this.document)
+      const html = render(this.container, this.document)
       this.set_selection(result.selection)
+
+      if (this.onchange) {
+        this.onchange(html)
+      }
     }
+  },
+
+  can_undo: function ()
+  {
+    return false;
+  },
+
+  can_redo: function ()
+  {
+    return false;
   }
 })
