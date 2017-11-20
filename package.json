@@ -1,7 +1,7 @@
 {
   "name": "edito",
   "version": "0.3.0",
-  "main": "edito",
+  "main": "src/index.js",
   "description": "More saner rich text editing for the web",
   "scripts": {
     "build": "gulp",
