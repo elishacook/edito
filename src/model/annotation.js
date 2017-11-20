@@ -14,6 +14,8 @@ Object.keys(aliases).forEach(function (canonical_name)
   {
     aliases_index[alias] = canonical_name
   })
+
+  aliases_index[canonical_name] = canonical_name
 })
 
 var Annotation =
@@ -41,6 +43,7 @@ var Annotation =
   
   get_canonical_name: function (name)
   {
+    name = name.toLowerCase()
     return (aliases_index[name] || name)
   },
   
