@@ -4,7 +4,8 @@ var aliases = {
   b: ['bold', 'strong'],
   em: ['i', 'italic'],
   u: ['underline'],
-  s: ['strike', 'strikethru', 'del']
+  s: ['strike', 'strikethru', 'del'],
+  a: ['link', 'anchor']
 }
 
 var aliases_index = {}
