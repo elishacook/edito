@@ -5,6 +5,16 @@ var Range = require('../model/range')
 
 module.exports = 
 {
+  focus: function (editor, event)
+  {
+    editor.unfreeze_selection()
+  },
+
+  blur: function (editor, event)
+  {
+    editor.freeze_selection()
+  },
+
   paste: function (editor, event)
   {
     event.preventDefault()
@@ -44,8 +54,13 @@ module.exports =
   
   selectionchange: function (editor, event)
   {
-    if (editor.onselectionchange) {
-      editor.onselectionchange(editor)
+    if (editor.onselectionchange)
+    {
+      var selection = editor.get_selection()
+      if (selection)
+      {
+        editor.onselectionchange(editor, selection)
+      }
     }
   }
 }

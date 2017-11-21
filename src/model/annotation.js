@@ -26,7 +26,7 @@ var Annotation =
     return Object.assign({
       offset: 0,
       length: 0,
-      priority: 0,
+      priority: 1,
       name: 'bold',
       attributes: {}
     }, args)

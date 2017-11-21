@@ -24,11 +24,14 @@ function Editor(args)
     args
   )
   
+  this.frozen_selection = null
   this.document = parse(this.container)
   render(this.container, this.document)
   
   this.container.contentEditable = true
   
+  this.container.addEventListener('focus', events.focus.bind(null, this))
+  this.container.addEventListener('blur', events.blur.bind(null, this))
   this.container.addEventListener('paste', events.paste.bind(null, this))
   this.container.addEventListener('input', events.input.bind(null, this))
   this.container.addEventListener('keydown', events.keydown.bind(null, this))
@@ -44,21 +47,70 @@ Object.assign(Editor.prototype,
   
   get_selection: function ()
   {
-    return selection.get(this.container, this.document)
+    if (this.frozen_selection)
+    {
+      return this.frozen_selection
+    }
+    else
+    {
+      return selection.get(this.container, this.document)
+    }
   },
   
   set_selection: function (x)
   {
-    selection.set(this.container, this.document, x)
+    if (this.frozen_selection)
+    {
+      this.frozen_selection = x
+    }
+    else
+    {
+      selection.set(this.container, this.document, x)
+    }
+  },
+
+  freeze_selection: function (sel)
+  {
+    this.frozen_selection = sel || selection.get(this.container, this.document)
+  },
+
+  unfreeze_selection: function ()
+  {
+    if (this.frozen_selection)
+    {
+      var x = this.frozen_selection
+      this.frozen_selection = null
+      this.set_selection(x)
+    }
   },
   
+  batch_commands: function (cmds)
+  {
+    var result = null
+    cmds.forEach(function (x)
+    {
+      result = this._run_command.apply(this, x)
+    }.bind(this))
+    this._update_after_command(result)
+  },
+
   run_command: function ()
+  {
+    this._update_after_command(
+      this._run_command.apply(this, arguments)
+    )
+  },
+
+  _run_command: function ()
   {
     var args = Array.prototype.slice.apply(arguments)
     var fn = args.shift()
     args.unshift(this.document)
-    var result = fn.apply(null, args)
-    
+    return fn.apply(null, args)
+  },
+
+  _update_after_command: function (result)
+  {
     if (result)
     {
       this.document = result.document
