@@ -78,9 +78,7 @@ Object.assign(Editor.prototype,
   {
     if (this.frozen_selection)
     {
-      var x = this.frozen_selection
       this.frozen_selection = null
-      this.set_selection(x)
     }
   },
   
